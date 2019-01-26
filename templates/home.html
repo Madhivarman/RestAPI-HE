@@ -1,0 +1,41 @@
+<html>
+<head>
+    <!--Import Google Icon Font-->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!--Import materialize.css-->
+    <link type="text/css" rel="stylesheet" href="static/css/materialize.min.css"  media="screen,projection"/>
+
+      <!--Let browser know website is optimized for mobile-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+</head>
+<body>
+    <div class="row"></div>
+    <div class="row"></div>
+    <div class="row">
+        <div class="col s3"></div>
+        <div class="col s6" style="border:1px solid black">
+            <div class="row">
+                <p class="center" style="font-size: 20px"> FILTERING BY ATTRIBUTES <p>
+            </div>
+            <div class="row" style="color:black">
+                <div class="col s2"></div>
+                <div class="col s8">
+                    <form name="prod-attr" action="." method="post">
+                        <label>Color( Space Grey, Silver):</label><input type="text" name="color">
+                        <label>Size(256GB, 64GB):</label><input type="number" name="size">
+                        <label>Rating: </label><input type="number" name="rating">
+                        <label>Verified(bool): </label><input type="text" name="verification">
+
+                        <input type="submit" value="submit">
+
+                    </form>
+                </div>
+                <div class="col s2"></div>
+            </div>
+        </div>
+        <div class="col s3"></div>
+    </div>
+    <!--JavaScript at end of body for optimized loading-->
+    <script type="text/javascript" src="static/js/materialize.min.js"></script>
+</body>
+</html>
