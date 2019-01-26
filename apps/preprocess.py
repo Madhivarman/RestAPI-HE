@@ -9,6 +9,8 @@ class Preprocess():
     def preprocess(self, df):
         """Have to preprocess the data"""
         usefulColumns = ['Author', 'Date', 'Colour', 'Verification', 'Rating', 'Title', 'Desc']
+        colsWithoutDesc = ['Author', 'Date', 'Colour', 'Verification', 'size']
+
 
         #get copy of the dataframe
         copydf = df.copy()
@@ -18,6 +20,7 @@ class Preprocess():
             strplit = [x.replace("[", "") for x in tempdf]
             strplit = [x.replace(']', '') for x in strplit]
             strplit = [x.replace("'", '') for x in strplit]
+            strplit = [x.replace("..", '') for x in strplit]
 
             copydf[columns] = strplit
 
@@ -28,5 +31,18 @@ class Preprocess():
 
         copydf['Colour'] = color
         copydf['size'] = size
+
+        """separate out the rating star"""
+        rating = [int(x.split(".")[0]) for x in copydf['Rating']]
+        copydf['Rating'] = rating
+        copydf['Verification'] = copydf['Verification'].apply(lambda x: 'True' if x == 'Verified Purchase' else 'False')
+
+        for columns in colsWithoutDesc:
+            tempdf = copydf[columns]
+            strplit = [x.replace(',','') for x in tempdf]
+            strplit = [x.replace(' ', '') for x in strplit]
+            strplit = [x.replace('.', '') for x in strplit]
+
+            copydf[columns] = strplit
 
         return copydf
