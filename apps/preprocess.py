@@ -1,5 +1,5 @@
+import datetime
 import pandas as pd
-
 
 class Preprocess():
 
@@ -9,7 +9,7 @@ class Preprocess():
     def preprocess(self, df):
         """Have to preprocess the data"""
         usefulColumns = ['Author', 'Date', 'Colour', 'Verification', 'Rating', 'Title', 'Desc']
-        colsWithoutDesc = ['Author', 'Date', 'Colour', 'Verification', 'size']
+        colsWithoutDesc = ['Author', 'Colour', 'Verification', 'size']
 
 
         #get copy of the dataframe
@@ -44,5 +44,50 @@ class Preprocess():
             strplit = [x.replace('.', '') for x in strplit]
 
             copydf[columns] = strplit
+
+        preprocessDate = [x.replace(",", '') for x in copydf['Date']]
+        preprocessDate = [x.replace(".", '') for x in preprocessDate]
+
+        """Create an dictionary"""
+        dateDict = {
+            "January": "Jan",
+            "February": "Feb",
+            "March": "Mar",
+            "April": "Apr",
+            "May": "May",
+            "June": "Jun",
+            "July": "Jul",
+            "August": "Aug",
+            "September": "Sep",
+            "October": "Oct",
+            "November": "Nov",
+            "December": "Dec"
+        }
+
+        splitBySpace = []
+        for date in preprocessDate:
+            month = date.split(" ")[1]
+            fulldate = date.replace(month, dateDict[month])
+            splitBySpace.append(fulldate)
+
+        fullweek, fullyear, fulldate, fullmonth = [], [], [], []
+
+        for date in splitBySpace:
+            """convert into datetime"""
+            date = date.strip()
+            nmd = datetime.datetime.strptime(date, '%d %b %Y')
+            nm = pd.to_datetime(nmd)
+            fullweek.append(nm.week)
+            fullyear.append(nm.year)
+            fulldate.append(nm.date)
+            fullmonth.append(nm.month)
+
+        """add all above data into a dataframe"""
+        print([len(fullmonth), len(fullyear), len(fullweek), len(fulldate)])
+
+        copydf['month'] = fullmonth
+        copydf['year'] = fullyear
+        copydf['week'] = fullweek
+        copydf['date'] = fulldate
 
         return copydf
