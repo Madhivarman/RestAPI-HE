@@ -23,7 +23,7 @@ Once the data is present, next is to fetch results via Web API. Run the followin
 
       python main.py
 
-This file will create a local host provides a local host link http:127.0.0.1:5000. Click this link it will redirect to small UI webpage which has all form to filter the data attributes.
+This file will create a local host provides a local host link http://127.0.0.1:5000. Click this link it will redirect to small UI webpage which has all form to filter the data attributes.
 
 ![alt text](https://github.com/Madhivarman/RestAPI-HR-/blob/master/images/frontWebUI.png)
 
