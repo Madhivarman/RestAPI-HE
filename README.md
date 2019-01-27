@@ -15,13 +15,13 @@ To make HTTP request for all JSON objects we need a Scrapped data as a JSON form
 
 Change the Python directory to `apps` and run the following command
 
-> python scrapping.py
+       python scrapping.py
 
 this script will automatically scrap all the data from web and stored the file as a JSON format under the directory `dataSrc`. At first this file check if already `scrapped.csv` is located in local file or not. If file is already present, the script starts preprocessing and store as a JSON format. Else, it will scrap the website and store the JSON file under the directory **dataSrc**
 
 Once the data is present, next is to fetch results via Web API. Run the following command to activate the flask application
 
-> python main.py
+      python main.py
 
 This file will create a local host provides a local host link http:127.0.0.1:5000. Click this link it will redirect to small UI webpage which has all form to filter the data attributes.
 
@@ -37,6 +37,10 @@ The result will be served in separate webpage called http://127.0.0.1:5000/api/r
 If you find this repository helpful please mention in your project. Feel free to open the issues if you face any while running the scripts.
 
 Make sure that you have mentioned the path correctly. If all paths are clear and correct then you won't face any problem running this application.
+
+### NOTE ###
+
+This application can query **Multiple combinations of attributes** or **single attributes**.
 
 ### Citations ###
 ```
