@@ -41,7 +41,8 @@ Make sure that you have mentioned the path correctly. If all paths are clear and
 ### NOTE ###
 
        1. This application can query **Multiple combinations of attributes** or **single attributes**.
-       2. Ignore other tabs in the browser ;)
+       2. Please make sure that you don't want to filter by Date Attribute set the toDate as large as possible. Say,Dec 31 2018
+       3. Ignore other tabs in the browser ;)
 
 ### Citations ###
 ```
