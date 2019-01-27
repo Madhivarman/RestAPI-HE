@@ -94,6 +94,11 @@ if __name__ == '__main__':
 
     root_filepath = "F://hackerearth/apps"
 
+    if not os.path.dirname(root_filepath + '/dataSrc'):
+        os.makedirs(root_filepath + '/dataSrc')
+
+    dataPath = "F://hackerearth/apps/dataSrc/"
+
     fileList = os.listdir(root_filepath)
 
     if 'scrappedData.csv' in fileList:
@@ -101,7 +106,20 @@ if __name__ == '__main__':
         sentiment_review = doSentimentAnalysis(processed_df['Desc'])
         """add sentiment to the processed_df"""
         processed_df['sentimentValue'] = sentiment_review
-        print(processed_df.head())
+
+        """save this final data to build rest api on it"""
+        finaldf = 'finaldf.csv'
+
+        if finaldf in os.listdir(dataPath):pass
+        else:
+            processed_df.to_csv(dataPath + finaldf, sep=",", index=False)
+
+        """Converting DataFrame file into JSON Format"""
+        jsonFilePath = dataPath + "inputFile.json"
+
+        with open(jsonFilePath, "w") as fp:
+            fp.write(processed_df.to_json(orient='records'))
+
 
     else:
         # create an object
@@ -110,3 +128,10 @@ if __name__ == '__main__':
         processed_df = goToPreprocessing()  # start directly preprocessing
         sentiment_review = doSentimentAnalysis(processed_df['Desc'])
         processed_df['sentimentValue'] = sentiment_review
+
+        """save this final data to build rest api on it"""
+        finaldf = 'finaldf.csv'
+
+        if finaldf in os.listdir(dataPath):pass
+        else:
+            processed_df.to_csv(dataPath + finaldf, sep=",", index=False)
