@@ -6,44 +6,54 @@ from flask import render_template
 import os
 import datetime
 import pandas as pd
+import json
 
 secret_Key = os.urandom(32)
 
 app = flask.Flask(__name__)
-app.config["DEBUG"] = False
+app.config["DEBUG"] = True
 app.config['SECRET_KEY'] = secret_Key
+
 
 @app.route('/')
 def home():
-    """Get all Filtering attributes we need"""
-    c = list(set(i['Colour'] for i in inputFile))
-    r = list(set(i['Rating'] for i in inputFile))
-    s = list(set(i['size'] for i in inputFile))
-    v = list(set(i['Verification'] for i in inputFile))
+    return render_template('home.html')
 
-    return render_template('home.html', color=c, rating=r, size=s, verify=v)
+@app.route('/api/results', methods=['POST'])
+def getValue():
+    prod_color = request.form['color']
+    prod_rating = request.form['rating']
+    prod_size = request.form['size']
+    prod_veri = request.form['verification']
+    prod_sentiment = request.form['sentimentValue']
+    prod_fromDate = request.form['fromDate']
+    prod_toDate = request.form['toDate']
 
-@app.route('/api/customer', methods=['GET'])
-def doFetchMatchedDetails(asList):
+    """All Above variable hold the form value which generates the RestAPI to see the Json Dump"""
+
+    asList = [prod_color, prod_rating, prod_size, prod_veri, prod_sentiment, prod_fromDate, prod_toDate]
+
     """Define a format list"""
     labelList = ['Colour', 'Rating', 'size', 'Verification', 'Sentiment', 'FromDate', 'ToDate']
 
     """zip the list"""
     zippedList = zip(labelList, asList)
-    keyLabel = [(k, v) for k,v in zippedList]
+    keyLabel = [(k, v) for k, v in zippedList]
     notEmptyLabel = {}
     for k, v in keyLabel:
         if not v:
             continue
         else:
-            notEmptyLabel.update({k:v})
+            notEmptyLabel.update({k: v})
 
     """convert the date into week and year"""
     fromDate = notEmptyLabel['FromDate'].replace(",", '')
-    fromDate = fromDate.replace("  "," ")
+    fromDate = fromDate.replace("  ", " ")
 
     toDate = notEmptyLabel['ToDate'].replace(",", '')
     toDate = toDate.replace("  ", ' ')
+
+    print("From Date:{}, To Date:{}".format(fromDate, toDate))
 
     fromDateobj = datetime.datetime.strptime(fromDate, '%b %d %Y')
     toDateobj = datetime.datetime.strptime(toDate, '%b %d %Y')
@@ -51,8 +61,8 @@ def doFetchMatchedDetails(asList):
     pdFdate = pd.to_datetime(fromDateobj)
     pdTdate = pd.to_datetime(toDateobj)
 
-    notEmptyLabel.update({'Fromweek':pdFdate.week})
-    notEmptyLabel.update({'FromYear':pdFdate.year})
+    notEmptyLabel.update({'Fromweek': pdFdate.week})
+    notEmptyLabel.update({'FromYear': pdFdate.year})
 
     notEmptyLabel.update({'Toweek': pdTdate.week})
     notEmptyLabel.update({'Toyear': pdTdate.year})
@@ -67,25 +77,25 @@ def doFetchMatchedDetails(asList):
     if weekTotalDiff == pdFdate.week:
         notEmptyLabel.update({'week': pdFdate.week})
     else:
-        notEmptyLabel.update({'week': [x for x in range(pdFdate.week, weekTotalDiff+1)]})
+        notEmptyLabel.update({'week': [x for x in range(pdFdate.week, weekTotalDiff + 1)]})
 
     if yearTotalDiff == pdFdate.year:
         notEmptyLabel.update({'year': pdFdate.year})
     else:
-        notEmptyLabel.update({'year': [x for x in range(pdFdate.year, weekTotalDiff+1)]})
+        notEmptyLabel.update({'year': [x for x in range(pdFdate.year, weekTotalDiff + 1)]})
 
     attributesWeNeed = ['Colour', 'size', 'Rating', 'Verification', 'sentimentValue', 'week', 'year']
     finalDict = {}
 
-    for k,v in notEmptyLabel.items():
+    for k, v in notEmptyLabel.items():
 
         if k in attributesWeNeed:
             finalDict.update({k: v})
 
     """Create an request API url to fetch the data"""
-    url = 'http://127.0.0.1:5000/api/customer?'
+    url = 'http://127.0.0.1:5000/api/customer/asList?'
     num = 1
-    for k,v in finalDict.items():
+    for k, v in finalDict.items():
         if num == len(finalDict):
             v = str(v)
             val = v.replace(" ", '%20')
@@ -99,14 +109,16 @@ def doFetchMatchedDetails(asList):
             """replace space by %20"""
             v = str(v)
             val = v.replace(" ", '%20')
-            val = val.replace("[",'')
+            val = val.replace("[", '')
             val = val.replace(",", '')
             val = val.replace("]", '')
             dummyURL = url + k + "=" + val + "&"
             url = dummyURL
 
-        num += 1 #increment the pointer to keep track
+        num += 1  # increment the pointer to keep track
     print("check this URL to see the result:{} \n".format(url))
+
+    print(asList)
 
     """Split by ?, &"""
     splitByFilter = url.split("?")[1]
@@ -119,7 +131,7 @@ def doFetchMatchedDetails(asList):
 
     keys = list(queryDict.keys())
 
-    for k,v in queryDict.items():
+    for k, v in queryDict.items():
         if k == 'week' or k == 'year':
             weekasList = []
             val = finalDict[k]
@@ -140,7 +152,7 @@ def doFetchMatchedDetails(asList):
             queryDict[k] = v
 
     """convert rating to integer"""
-    for k,v in queryDict.items():
+    for k, v in queryDict.items():
         if k == 'Rating' or k == 'size':
             queryDict[k] = int(v)
 
@@ -192,28 +204,14 @@ def doFetchMatchedDetails(asList):
     finalResult = phaseIcopy
 
     print("Final Dataframe Shape is:{}".format(finalResult.shape))
-
-    """convert the dataframe to json"""
-    print("Checkout this URL:{}".format(url))
-    finalresultDump = finalResult.to_json(orient="records")
-    return jsonify(finalresultDump)
-
-
-@app.route('/', methods=['POST'])
-def getValue():
-    prod_color = request.form['color']
-    prod_rating = request.form['rating']
-    prod_size = request.form['size']
-    prod_veri = request.form['verification']
-    prod_sentiment = request.form['sentimentValue']
-    prod_fromDate = request.form['fromDate']
-    prod_toDate = request.form['toDate']
-
-    """All Above variable hold the form value which generates the RestAPI to see the Json Dump"""
-
-    asList = [prod_color, prod_rating, prod_size, prod_veri, prod_sentiment, prod_fromDate, prod_toDate]
-    doFetchMatchedDetails(asList)
-    return render_template('home.html')
+    d = [
+        dict([
+            (colname, row[i])
+            for i, colname in enumerate(finalResult.columns)
+        ])
+        for row in finalResult.values
+    ]
+    return jsonify(d)
 
 @app.route('/api/customer/all', methods=['GET'])
 def api_all():
@@ -222,4 +220,5 @@ def api_all():
 if __name__ == '__main__':
     peopleobj = People()
     inputFile = peopleobj.readJsonFile()
+    finalresultDump = {}
     app.run()
