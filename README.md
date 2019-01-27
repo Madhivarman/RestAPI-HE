@@ -40,7 +40,8 @@ Make sure that you have mentioned the path correctly. If all paths are clear and
 
 ### NOTE ###
 
-This application can query **Multiple combinations of attributes** or **single attributes**.
+       1. This application can query **Multiple combinations of attributes** or **single attributes**.
+       2. Ignore other tabs in the browser ;)
 
 ### Citations ###
 ```
