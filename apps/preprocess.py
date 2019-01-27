@@ -85,6 +85,9 @@ class Preprocess():
         """add all above data into a dataframe"""
         print([len(fullmonth), len(fullyear), len(fullweek), len(fulldate)])
 
+        copydf['Rating'] =  pd.to_numeric(copydf['Rating'], downcast='integer')
+        copydf['size'] = [x.replace("GB","") for x in pd.Series(copydf['size'])]
+        copydf['size'] = pd.to_numeric(copydf['size'], downcast='integer')
         copydf['month'] = fullmonth
         copydf['year'] = fullyear
         copydf['week'] = fullweek
