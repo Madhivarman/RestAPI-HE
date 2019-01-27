@@ -20,7 +20,7 @@
             <div class="row" style="color:black">
                 <div class="col s2"></div>
                 <div class="col s8">
-                    <form name="prod-attr" action="." method="post">
+                    <form name="prod-attr" action="/api/results" method="post">
                         <label>Color( Space Grey, Silver):</label><input type="text" name="color">
                         <label>Size(256GB, 64GB):</label><input type="number" name="size">
                         <label>Rating: </label><input type="number" name="rating">
@@ -43,7 +43,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
         var options = {
-            defaultDate: new Date(2018, 1, 3),
+            defaultDate: new Date(2018, 2, 3),
             setDefaultDate: true
         };
         var elems = document.querySelector('.datepicker');
