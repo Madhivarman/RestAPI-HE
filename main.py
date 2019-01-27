@@ -23,10 +23,10 @@ def home():
 
     return render_template('home.html', color=c, rating=r, size=s, verify=v)
 
-@app.route('/api/customer/', methods=['GET'])
+@app.route('/api/customer', methods=['GET'])
 def doFetchMatchedDetails(asList):
     """Define a format list"""
-    labelList = ['Color', 'Rating', 'Size', 'Verification', 'Sentiment', 'FromDate', 'ToDate']
+    labelList = ['Colour', 'Rating', 'size', 'Verification', 'Sentiment', 'FromDate', 'ToDate']
 
     """zip the list"""
     zippedList = zip(labelList, asList)
@@ -74,7 +74,7 @@ def doFetchMatchedDetails(asList):
     else:
         notEmptyLabel.update({'year': [x for x in range(pdFdate.year, weekTotalDiff+1)]})
 
-    attributesWeNeed = ['Color', 'Size', 'Rating', 'Verification', 'Sentiment', 'week', 'year']
+    attributesWeNeed = ['Colour', 'size', 'Rating', 'Verification', 'sentimentValue', 'week', 'year']
     finalDict = {}
 
     for k,v in notEmptyLabel.items():
@@ -108,6 +108,96 @@ def doFetchMatchedDetails(asList):
         num += 1 #increment the pointer to keep track
     print("check this URL to see the result:{} \n".format(url))
 
+    """Split by ?, &"""
+    splitByFilter = url.split("?")[1]
+    attributeFilter = splitByFilter.split("&")
+    separateFilters = [x.split('=') for x in attributeFilter]
+
+    queryDict = {}
+    for i in separateFilters:
+        queryDict.update({i[0]: i[1]})
+
+    keys = list(queryDict.keys())
+
+    for k,v in queryDict.items():
+        if k == 'week' or k == 'year':
+            weekasList = []
+            val = finalDict[k]
+            if type(val) == 'int':
+                weekasList.append(val)
+            else:
+                val = v.split("%20")
+                for num, v in enumerate(val):
+                    if num == 0:
+                        weekasList.append(int(v))
+                    elif num % 2 == 0 and num != 0:
+                        continue
+                    else:
+                        weekasList.append(int(v))
+            queryDict[k] = weekasList
+
+        else:
+            queryDict[k] = v
+
+    """convert rating to integer"""
+    for k,v in queryDict.items():
+        if k == 'Rating' or k == 'size':
+            queryDict[k] = int(v)
+
+    values = [queryDict[val] for val in keys]
+
+    """convert the json dump to pandas dataframe to write condition easily"""
+    fileDf = pd.DataFrame.from_dict(inputFile)
+    tempdf = fileDf.copy()
+
+    """Features to pop from the list"""
+    features_toPop = ["week", "year"]
+    onlySingleFilters = list(set(keys) - set(features_toPop))
+
+    indexOf = [keys.index(x) for x in onlySingleFilters]
+    """iterate through the list to query the filter"""
+    for phaseIcols in indexOf:
+        key, value = keys[phaseIcols], values[phaseIcols]
+        resultdf = tempdf[tempdf[key] == value]
+        tempdf = resultdf
+
+    phaseIresult = tempdf
+
+    print("Phase I result Dataframe:{}".format(phaseIresult.shape))
+
+    """fetch data between the series"""
+    phaseIcopy = phaseIresult.copy()
+    phaseIIindexOf = [keys.index(x) for x in features_toPop]
+    """Create an empty dataframe"""
+    finalResult = pd.DataFrame()
+
+    for d in phaseIIindexOf:
+        key, value = keys[d], values[d]
+        print("Key:{}, Value:{}".format(key, value))
+        if type(value) == list:
+            if len(value) == 1:
+                resultdf = phaseIcopy[phaseIcopy[key] == value[0]]
+                phaseIcopy = resultdf
+            else:
+                weekRangeBool = pd.Series(phaseIcopy['week'])
+                first, last = value[0], value[-1]
+                phaseIcopy['boolCondition'] = weekRangeBool.between(first, last)
+                resultdf = phaseIcopy[phaseIcopy['boolCondition'] == True]
+                phaseIcopy = resultdf
+                print(phaseIcopy.shape)
+        else:
+            resultdf = phaseIcopy[phaseIresult[key] == value]
+            phaseIcopy = resultdf
+
+    finalResult = phaseIcopy
+
+    print("Final Dataframe Shape is:{}".format(finalResult.shape))
+
+    """convert the dataframe to json"""
+    print("Checkout this URL:{}".format(url))
+    finalresultDump = finalResult.to_json(orient="records")
+    return jsonify(finalresultDump)
+
 
 @app.route('/', methods=['POST'])
 def getValue():
@@ -129,9 +219,7 @@ def getValue():
 def api_all():
     return jsonify(inputFile)
 
-
 if __name__ == '__main__':
     peopleobj = People()
     inputFile = peopleobj.readJsonFile()
-
     app.run()
