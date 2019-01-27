@@ -31,6 +31,8 @@ if you query the data by Sentiment level. Use **below** or **above** in the form
 
 The result will be served in separate webpage called http://127.0.0.1:5000/api/results
 
+To view all customer data go to http://127.0.0.1:5000/api/customer/all
+
 ![alt text](https://github.com/Madhivarman/RestAPI-HR-/blob/master/images/resultDisplay.png)
 
 
