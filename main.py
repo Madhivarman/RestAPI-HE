@@ -34,7 +34,7 @@ def getValue():
     asList = [prod_color, prod_rating, prod_size, prod_veri, prod_sentiment, prod_fromDate, prod_toDate]
 
     """Define a format list"""
-    labelList = ['Colour', 'Rating', 'size', 'Verification', 'Sentiment', 'FromDate', 'ToDate']
+    labelList = ['Colour', 'Rating', 'size', 'Verification', 'sentimentValue', 'FromDate', 'ToDate']
 
     """zip the list"""
     zippedList = zip(labelList, asList)
@@ -84,6 +84,7 @@ def getValue():
     else:
         notEmptyLabel.update({'year': [x for x in range(pdFdate.year, weekTotalDiff + 1)]})
 
+
     attributesWeNeed = ['Colour', 'size', 'Rating', 'Verification', 'sentimentValue', 'week', 'year']
     finalDict = {}
 
@@ -117,8 +118,6 @@ def getValue():
 
         num += 1  # increment the pointer to keep track
     print("check this URL to see the result:{} \n".format(url))
-
-    print(asList)
 
     """Split by ?, &"""
     splitByFilter = url.split("?")[1]
@@ -170,8 +169,19 @@ def getValue():
     """iterate through the list to query the filter"""
     for phaseIcols in indexOf:
         key, value = keys[phaseIcols], values[phaseIcols]
-        resultdf = tempdf[tempdf[key] == value]
-        tempdf = resultdf
+        """if key is sentimentValue do some preprocessing"""
+        if key == 'sentimentValue':
+            splitByspace = value.split("%20")
+            print(splitByspace)
+            if splitByspace[0] == 'Above' or splitByspace[0] == 'above':
+                resultdf = tempdf[tempdf[key] >= float(splitByspace[1])]
+                tempdf = resultdf
+            else:
+                resultdf = tempdf[tempdf[key] <= float(splitByspace[1])]
+                tempdf = resultdf
+        else:
+            resultdf = tempdf[tempdf[key] == value]
+            tempdf = resultdf
 
     phaseIresult = tempdf
 
