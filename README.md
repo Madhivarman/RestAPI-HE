@@ -46,15 +46,6 @@ Make sure that you have mentioned the path correctly. If all paths are clear and
        2. Please make sure that you don't want to filter by Date Attribute set the toDate as large as possible. Say,Dec 31 2018
        3. Ignore other tabs in the browser ;)
        
-### The Major Challenge ###
-
-One of the use case of this problem statement is that API should able to get GET products based on Date Range. Traversing through Date Range(string) object is impossible. So, to GET attributes within the date Range I did the following things
-
-  1. Convert the Date Range into TimeStamp. Convert into pandas DateTime Timestamp
-  2. Get Week, month, Date respect to the year. Adding this field to main JSON File which makes us to traverse through the Date Range too easy.
-  3. IMPORTANT NOTE: This is my first time try building REST API. If you find any error, or  not optimized way please notify me. I will try to rectify it and resend it to you. So far, the application will works all case. :)
-
-The Original link has only 6 reviews. I taught it's too small to the challenging problem. That's why I scrapped all the reviews for IPhone X which has total 1030 customer reviews.
 
 ### Citations ###
 ```
