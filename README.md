@@ -17,7 +17,7 @@ Change the Python directory to `apps` and run the following command
 
        python scrapping.py
 
-this script will automatically scrap all the data from web and stored the file as a JSON format under the directory `dataSrc`. At first this file check if already `scrapped.csv` is located in local file or not. If file is already present, the script starts preprocessing and store as a JSON format. Else, it will scrap the website and store the JSON file under the directory **dataSrc**
+this script will automatically scrap all the data from web and stored the file as a JSON format under the directory `dataSrc`. At first check if the file `scrapped.csv` is located in local file or not. If file is already present, the script starts preprocessing and store as a JSON format. Else, it will scrap the website and store the JSON file under the directory **dataSrc**
 
 Once the data is present, next is to fetch results via Web API. Run the following command to activate the flask application
 
